@@ -2,7 +2,7 @@
 variable "vpc_id" {
   description = "VPC ID where resources will be deployed"
   type        = string
-  default     = "vpc-0fcd1864ebf95b4eb"
+  default     = "vpc-0bbc6afe7a8d32c90"
 }
 
 variable "mongo_ami_id" {

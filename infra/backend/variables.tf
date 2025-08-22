@@ -89,19 +89,19 @@ variable "container_port" {
 variable "service_desired_count" {
   description = "Desired number of containers in the ECS service"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "service_min_count" {
   description = "Minimum number of containers in the ECS service"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "service_max_count" {
   description = "Maximum number of containers in the ECS service"
   type        = number
-  default     = 0
+  default     = 3
 }
 
 variable "service_cpu_target" {

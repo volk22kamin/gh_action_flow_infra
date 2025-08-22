@@ -26,6 +26,22 @@ jobs:
   ci:
     name: Build & Test & Scan
     runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: rootpass
+        options: >-
+          --name gha-mongo
+          --health-cmd="mongosh --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
     defaults:
       run:
         working-directory: ${{ env.APP_DIR }}
@@ -35,14 +51,34 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: '${{ env.APP_DIR }}/package-lock.json'
+
+      # Wait for Mongo to be healthy and export URI for tests
+      - name: Wait for Mongo & set MONGODB_URI
+        run: |
+          set -euo pipefail
+          # wait until the service is healthy
+          for i in {1..60}; do
+            STATUS=$(docker inspect --format='{{json .State.Health.Status}}' gha-mongo | tr -d '"')
+            if [ "$STATUS" = "healthy" ]; then
+              echo "MongoDB is healthy"
+              break
+            fi
+            echo "Waiting for MongoDB... ($i/60)"
+            sleep 2
+          done
+          # expose URI to the rest of the job (tests read this)
+          echo "MONGODB_URI=mongodb://root:rootpass@127.0.0.1:27017/test?authSource=admin" >> $GITHUB_ENV
 
       - name: Install deps
         run: npm ci
 
       - name: Run tests
+        env:
+          # Optional: make sure your app actually uses this env
+          MONGODB_URI: ${{ env.MONGODB_URI }}
         run: npm test --if-present
 
       - name: Build Docker image (local only)
@@ -59,6 +95,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
+
 
   deploy:
     name: Push to ECR + Update ECS service
