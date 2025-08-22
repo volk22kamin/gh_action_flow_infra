@@ -43,7 +43,7 @@
         }
  
         .todo-button:hover {
-            background-color: #9ea045;
+            background-color: #45a049;
         }
 
         .todo-list {
@@ -95,12 +95,11 @@
         <ul class="todo-list" id="todoList"></ul>
     </div>
 
-    <script src="config.js"></script>
-
     <script>
-        const API_URL = window._env_.API_URL;
-        console.log('API_URL:', API_URL);
+        const API_URL = "%%API_URL%%";
+        console.log("API_URL:", API_URL);
 
+        // Fetch all todos
         async function fetchTodos() {
             try {
                 console.log('Attempting to fetch todos from:', `${API_URL}/todos`);
@@ -129,6 +128,7 @@
         }
 
 
+        // Add new todo
         async function addTodo(text) {
             try {
                 const response = await fetch(`${API_URL}/todos`, {
@@ -145,6 +145,7 @@
             }
         }
 
+        // Toggle todo completion
         async function toggleTodo(id, completed) {
             try {
                 await fetch(`${API_URL}/todos/${id}`, {
@@ -160,6 +161,7 @@
             }
         }
 
+        // Delete todo
         async function deleteTodo(id) {
             try {
                 await fetch(`${API_URL}/todos/${id}`, {
@@ -171,6 +173,7 @@
             }
         }
 
+        // Render todos
         function renderTodos(todos) {
             const todoList = document.getElementById('todoList');
             todoList.innerHTML = '';
@@ -186,7 +189,7 @@
                 checkbox.addEventListener('change', () => toggleTodo(todo._id, checkbox.checked));
                 
                 const span = document.createElement('span');
-                span.className = `todo-text ${todo.completed ? 'completed' : ''}`;
+                span.className = `todo-text ${todo.completed ? "completed" : ""}`;
                 span.textContent = todo.text;
                 
                 const deleteButton = document.createElement('button');
@@ -201,6 +204,7 @@
             });
         }
 
+        // Event listeners
         document.getElementById('todoForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const input = document.getElementById('todoInput');
@@ -212,6 +216,7 @@
             }
         });
 
+        // Initial load
         fetchTodos();
     </script>
 </body>
