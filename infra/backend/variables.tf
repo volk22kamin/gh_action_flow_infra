@@ -7,13 +7,13 @@ variable "vpc_id" {
 variable "mongodb_uri" {
   description = "MongoDB connection URI"
   type        = string
-  default     = "mongodb://10.0.2.152:27017/todo"
+  default     = "mongodb://admin:volk_password@10.0.2.152:27017/todo"
 }
 
 variable "container_image" {
   description = "Docker image for the Node.js container"
   type        = string
-  default     = "667308168455.dkr.ecr.eu-central-1.amazonaws.com/todo-server:ecs.2"
+  default     = "667308168455.dkr.ecr.eu-central-1.amazonaws.com/secure-app-backend:75ef53f12813"
 }
 
 variable "ami_id" {
