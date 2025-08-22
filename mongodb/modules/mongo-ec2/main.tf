@@ -46,6 +46,7 @@ if grep -q "^  bindIp: 127.0.0.1" "$MONGO_CONF"; then
 elif grep -q "^bindIp: 127.0.0.1" "$MONGO_CONF"; then
   sed -i 's/^bindIp: 127.0.0.1/bindIp: 0.0.0.0/' "$MONGO_CONF"
 fi
+sudo sed -i '/#security:/c\security:\n  authorization: enabled' /etc/mongod.conf
 
 # Start mongod in the background to allow user creation
 systemctl restart mongod
