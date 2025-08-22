@@ -12,11 +12,14 @@ app.use(cors());
 app.use(express.json());
 
 const isTestEnv = process.env.NODE_ENV === 'test';
-const uri = process.env.MONGODB_URI || (isTestEnv ? 'mongodb://localhost:27017/todoapp_test' : 'mongodb://localhost:27017/todoapp');
+const uri = process.env.MONGODB_URI || (isTestEnv ? 'mongodb://localhost:37017/todoapp_test' : 'mongodb://localhost:27017/todoapp');
 
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
+})
+.catch(err => {
+    console.error('Initial Database connection failed:', err);
 });
 
 mongoose.connection.on('error', (err) => {
