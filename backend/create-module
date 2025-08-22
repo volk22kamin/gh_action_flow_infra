@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <module-name>"
+  exit 1
+fi
+
+MODULE_NAME=$1
+MODULE_DIR="./modules/$MODULE_NAME"
+
+mkdir -p "$MODULE_DIR"
+touch "$MODULE_DIR/main.tf"
+touch "$MODULE_DIR/outputs.tf"
+touch "$MODULE_DIR/variables.tf"
+touch "$MODULE_DIR/data.tf"
+touch "$MODULE_DIR/provider.tf"
+
+echo "Module '$MODULE_NAME' initialized at $MODULE_DIR"
+
