@@ -7,7 +7,7 @@ variable "vpc_id" {
 variable "mongodb_uri" {
   description = "MongoDB connection URI"
   type        = string
-  default     = "mongodb://admin:volk_password@10.0.2.152:27017/todo"
+  default     = "mongodb://admin:volk_password@10.0.2.152:27017/todo?authSource=admin"
 }
 
 variable "container_image" {

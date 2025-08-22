@@ -23,20 +23,3 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 }
-
-
-
-data "aws_security_groups" "ecs_service" {
-  filter {
-    name   = "group-name"
-    values = ["basic-todo-app-cluster-sg"]
-  }
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
-  }
-}
-
-locals {
-  ecs_service_sg_id = length(data.aws_security_groups.ecs_service.ids) > 0 ? data.aws_security_groups.ecs_service.ids[0] : null
-}

@@ -12,11 +12,11 @@ variable "mongo_ami_id" {
 }
 
 # taken from module 'backend' after creation
-# variable "ecs_service_sg_id" {
-#   description = "Security group ID for the ECS service"
-#   type        = list(string)
-#   default     = []
-# }
+variable "ecs_service_sg_id" {
+  description = "Security group ID for the ECS service"
+  type        = list(string)
+  default     = ["sg-0549ee4eae725fec6"]
+}
 # until here
 
 variable "region" {

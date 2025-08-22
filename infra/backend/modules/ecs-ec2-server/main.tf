@@ -63,6 +63,11 @@ resource "aws_iam_role_policy_attachment" "ecs_ec2_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
+resource "aws_iam_role_policy_attachment" "ecr_readonly" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 # Add CloudWatch Logs permissions
 resource "aws_iam_role_policy_attachment" "cloudwatch_logs_policy" {
   role       = aws_iam_role.ssm_role.name
