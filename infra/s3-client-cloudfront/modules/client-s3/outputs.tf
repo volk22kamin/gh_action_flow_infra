@@ -13,6 +13,10 @@ output "bucket_domain_name" {
   value       = aws_s3_bucket.this.bucket_domain_name
 }
 
+output "bucket_regional_domain_name" {
+  value = aws_s3_bucket.this.bucket_regional_domain_name
+}
+
 output "website_endpoint" {
   description = "The website endpoint of the S3 bucket"
   value       = aws_s3_bucket.this.website_endpoint

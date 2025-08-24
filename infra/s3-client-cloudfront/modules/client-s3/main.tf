@@ -26,10 +26,9 @@ resource "aws_s3_bucket_public_access_block" "this" {
 }
 
 resource "aws_s3_object" "index" {
-  bucket = aws_s3_bucket.this.id
-  key    = "index.html"
-  content = replace(file("${path.module}/index.tpl.html"),
-    "%%API_URL%%", var.server_url
-  )
+  bucket       = aws_s3_bucket.this.id
+  key          = "index.html"
+  # place holder
+  source       = "${path.module}/index.html"
   content_type = "text/html"
 }

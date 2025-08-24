@@ -12,6 +12,9 @@ output "client_s3_bucket_domain_name" {
   description = "The domain name of the client S3 bucket"
   value       = module.client_s3.bucket_domain_name
 }
+output "bucket_regional_domain_name" {
+  value = module.client_s3.bucket_regional_domain_name
+}
 
 output "client_s3_website_endpoint" {
   description = "The website endpoint of the client S3 bucket"
