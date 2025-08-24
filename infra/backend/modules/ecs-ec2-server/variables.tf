@@ -15,14 +15,9 @@ variable "target_group_arn" {
   default     = ""
 }
 
-variable "vpc_id" {
-  description = "VPC ID where resources will be deployed"
-  type        = string
-}
-
-variable "vpc_cidr" {
-  description = "CIDR block of the VPC"
-  type        = string
+variable "ecs_sg_id" {
+  description = "security group for ecs to mongo"
+  type = string
 }
 
 variable "private_subnet_ids" {

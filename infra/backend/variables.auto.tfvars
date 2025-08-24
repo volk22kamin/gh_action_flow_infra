@@ -1,4 +1,5 @@
-vpc_id = "vpc-07191a8a15aa5aae9"
+vpc_id = "vpc-02099f6c829cbc203"
+ecs_sg_id = "sg-0d6c8a21e5ba30f99"
 alb_name = "secure-app-server"
 container_port = 3000
 health_check_path = "/health"

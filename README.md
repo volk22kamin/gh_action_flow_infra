@@ -8,6 +8,7 @@ This repository contains a full-stack application with a robust infrastructure-a
 	- ALB and ECS communicate only through a dedicated SG.
 	- MongoDB and ECS communicate only through a dedicated SG.
 - **MongoDB on EC2**: Database runs on an EC2 instance within the VPC. AWS SSM agent is installed on all EC2 instances for secure, auditable connections (no SSH exposure).
+- **Secrets Management**: MongoDB password is generated and stored in AWS Secrets Manager, and securely passed as a secret to the ECS task at runtime. Secret created manually as to not have the password in terraform's state.
 - **ECS Cluster**: Hosts the application server as a container. The ECS service is set to 0 tasks by default; the CI pipeline can scale it up as needed. An Auto Scaling Group (ASG) is configured to scale ECS tasks based on CPU load.
 - **ALB (Application Load Balancer)**: Exposes the ECS service to the internet.
 - **S3 (Client HTML)**: Stores the static client files.

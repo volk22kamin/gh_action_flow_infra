@@ -33,6 +33,11 @@ variable "ami_id" {
   type        = string
 }
 
+variable "ecs_sg_id" {
+  description = "security group for ecs to mongo"
+  type        = string
+}
+
 variable "region" {
   description = "The AWS region to deploy the application"
 }

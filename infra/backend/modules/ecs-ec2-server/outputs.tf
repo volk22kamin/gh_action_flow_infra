@@ -32,11 +32,6 @@ output "asg_name" {
   value       = aws_autoscaling_group.ecs_asg.name
 }
 
-output "security_group_id" {
-  description = "ID of the security group for ECS instances"
-  value       = aws_security_group.ecs_sg.id
-}
-
 output "cloudwatch_log_group_name" {
   description = "Name of the CloudWatch Log Group for ECS logs"
   value       = aws_cloudwatch_log_group.ecs_logs.name

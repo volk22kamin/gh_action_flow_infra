@@ -32,10 +32,6 @@ output "asg_name" {
   value       = module.ecs_ec2_server.asg_name
 }
 
-output "security_group_id" {
-  description = "ID of the security group for ECS instances"
-  value       = module.ecs_ec2_server.security_group_id
-}
 
 output "cloudwatch_log_group_name" {
   description = "Name of the CloudWatch Log Group for ECS logs"

@@ -19,71 +19,71 @@ module "vpc_endpoints" {
     subnet_ids          = module.vpc.private_subnet_ids
     route_table_ids     = [module.vpc.private_route_table_id]
     vpc_endpoints = [
-        {
-            service_name        = "com.amazonaws.${var.region}.s3"
-            type                = "Gateway"
-            tags                = { Name = "S3 Gateway Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ecr.api"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "ECR API Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ecr.dkr"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "ECR Docker Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.logs"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "CloudWatch Logs Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ssm"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "SSM Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ssmmessages"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "SSM Messages Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ec2messages"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "EC2 Messages Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ecs"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "ECS Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ecs-agent"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "ECS Agent Endpoint" }
-        },
-        {
-            service_name        = "com.amazonaws.${var.region}.ecs-telemetry"
-            type                = "Interface"
-            private_dns_enabled = true
-            tags                = { Name = "ECS Telemetry Endpoint" }
-        },
-        {
-          service_name        = "com.amazonaws.${var.region}.secretsmanager"
-          type                = "Interface"
-          private_dns_enabled = true
-          tags                = { Name = "secretsmanager Endpoint" }
-        }   
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.s3"
+        #     type                = "Gateway"
+        #     tags                = { Name = "S3 Gateway Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ecr.api"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "ECR API Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ecr.dkr"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "ECR Docker Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.logs"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "CloudWatch Logs Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ssm"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "SSM Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ssmmessages"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "SSM Messages Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ec2messages"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "EC2 Messages Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ecs"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "ECS Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ecs-agent"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "ECS Agent Endpoint" }
+        # },
+        # {
+        #     service_name        = "com.amazonaws.${var.region}.ecs-telemetry"
+        #     type                = "Interface"
+        #     private_dns_enabled = true
+        #     tags                = { Name = "ECS Telemetry Endpoint" }
+        # },
+        # {
+        #   service_name        = "com.amazonaws.${var.region}.secretsmanager"
+        #   type                = "Interface"
+        #   private_dns_enabled = true
+        #   tags                = { Name = "secretsmanager Endpoint" }
+        # }   
     ]
     vpc_cidr_block        = module.vpc.vpc_cidr
     default_tags          = var.default_tags

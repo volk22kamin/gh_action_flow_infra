@@ -2,9 +2,8 @@ module "ecs_ec2_server" {
   source = "./modules/ecs-ec2-server"
 
   cluster_name          = var.cluster_name
-  vpc_id                = var.vpc_id
-  vpc_cidr              = data.aws_vpc.secure_app_vpc.cidr_block
   private_subnet_ids    = data.aws_subnets.private.ids
+  ecs_sg_id             = var.ecs_sg_id
   instance_type         = var.instance_type
   key_name              = var.key_name
   volume_size           = var.volume_size
@@ -35,6 +34,6 @@ module "ecs_api_alb" {
   vpc_id                 = var.vpc_id
   public_subnet_ids      = data.aws_subnets.public.ids
   container_port         = var.container_port
-  ecs_security_group_id  = module.ecs_ec2_server.security_group_id
+  ecs_security_group_id  = var.ecs_sg_id
   health_check_path      = var.health_check_path
 }
