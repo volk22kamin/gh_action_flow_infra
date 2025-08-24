@@ -143,8 +143,8 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 }
 
 # For the secret pull
-resource "aws_iam_role" "ecs_task_execution" {
-  name = "${var.cluster_name}-ecs-task-execution"
+resource "aws_iam_role" "ecs_task_role" {
+  name = "${var.cluster_name}-ecs-task-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -153,11 +153,6 @@ resource "aws_iam_role" "ecs_task_execution" {
       Action   = "sts:AssumeRole"
     }]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_task_exec_managed" {
-  role       = aws_iam_role.ecs_task_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 resource "aws_iam_policy" "ecs_task_exec_secrets" {
@@ -174,9 +169,14 @@ resource "aws_iam_policy" "ecs_task_exec_secrets" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_exec_secrets_attach" {
-  role       = aws_iam_role.ecs_task_execution.name
+  role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.ecs_task_exec_secrets.arn
 }
+resource "aws_iam_role_policy_attachment" "ecs_task_exec_managed" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
 
 
 # Create an ECS Task Definition for the Node.js container
@@ -187,8 +187,8 @@ resource "aws_ecs_task_definition" "nodejs_task" {
   cpu                      = var.task_cpu
   memory                   = var.task_memory
 
-  execution_role_arn = aws_iam_role.ecs_task_execution.arn
-  
+  execution_role_arn = aws_iam_role.ecs_task_role.arn
+
   container_definitions = jsonencode([
     {
       name      = "nodejs-container"
@@ -211,6 +211,10 @@ resource "aws_ecs_task_definition" "nodejs_task" {
         }
       ]
       environment = [
+        # {
+        #   name = "MONGO_PASSWORD"
+        #   value = "volk_password"
+        # },
         {
           name  = "MONGO_HOST"
           value = var.mongo_host
@@ -261,7 +265,7 @@ resource "aws_ecs_service" "nodejs_service" {
 
   # Enable ECS Service Auto Scaling
   lifecycle {
-    ignore_changes = [task_definition, desired_count]
+    ignore_changes = [desired_count]
   }
 }
 
