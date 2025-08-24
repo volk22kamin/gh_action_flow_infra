@@ -1,13 +1,13 @@
 variable "vpc_id" {
   description = "VPC ID where resources will be deployed"
   type        = string
-  default     = "vpc-0bbc6afe7a8d32c90"
+  default     = "vpc-0e40433212b981cc5"
 }
 
 variable "mongodb_uri" {
   description = "MongoDB connection URI"
   type        = string
-  default     = "mongodb://admin:volk_password@10.0.2.152:27017/todo?authSource=admin"
+  default     = "mongodb://admin:volk_password@10.0.2.79:27017/todo?authSource=admin"
 }
 
 variable "container_image" {
@@ -77,7 +77,7 @@ variable "task_cpu" {
 variable "task_memory" {
   description = "Memory (in MiB) for the ECS task"
   type        = number
-  default     = 512
+  default     = 256
 }
 
 variable "container_port" {
@@ -89,13 +89,13 @@ variable "container_port" {
 variable "service_desired_count" {
   description = "Desired number of containers in the ECS service"
   type        = number
-  default     = 1
+  default     = 0
 }
 
 variable "service_min_count" {
   description = "Minimum number of containers in the ECS service"
   type        = number
-  default     = 1
+  default     = 0
 }
 
 variable "service_max_count" {

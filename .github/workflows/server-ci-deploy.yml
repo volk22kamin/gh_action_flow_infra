@@ -121,8 +121,8 @@ jobs:
           IMAGE="${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}"
           SHA_TAG="${IMAGE}:${GITHUB_SHA::12}"
           LATEST_TAG="${IMAGE}:latest"
-          echo "image=${IMAGE}"   >> $GITHUB_OUTPUT
-          echo "sha=${SHA_TAG}"   >> $GITHUB_OUTPUT
+          echo "image=${IMAGE}"     >> $GITHUB_OUTPUT
+          echo "sha=${SHA_TAG}"     >> $GITHUB_OUTPUT
           echo "latest=${LATEST_TAG}" >> $GITHUB_OUTPUT
 
       - name: Build & push image
@@ -141,54 +141,94 @@ jobs:
           ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}        # name or ARN
           ECS_SERVICE: ${{ vars.ECS_SERVICE }}        # name or ARN
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}  # e.g., nodejs-container
-          NEW_IMAGE: ${{ steps.tags.outputs.sha }}
+          NEW_IMAGE: ${{ steps.tags.outputs.sha }}    # full ECR URI:TAG from step above
         run: |
           set -euo pipefail
-          # Get the task definition ARN currently used by the service
+
           TD_ARN=$(aws ecs describe-services \
             --cluster "$ECS_CLUSTER" \
             --services "$ECS_SERVICE" \
             --query 'services[0].taskDefinition' \
             --output text)
 
-          # Fetch the TD JSON and strip readonly fields
           aws ecs describe-task-definition \
             --task-definition "$TD_ARN" \
-            --query 'taskDefinition' --output json \
-          | jq 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy,.inferenceAccelerators,.ephemeralStorage)' \
+            --query 'taskDefinition' --output json > td.json
+
+          # Ensure target container exists
+          jq -e --arg NAME "$CONTAINER_NAME" \
+            'any(.containerDefinitions[]; .name == $NAME)' td.json >/dev/null || {
+              echo "Container \"$CONTAINER_NAME\" not found in task definition"; exit 1;
+            }
+
+          # Strip ONLY read-only fields, keep valid config like ephemeralStorage/runtimePlatform/etc.
+          jq '
+            del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .registeredAt,
+              .registeredBy,
+              .requiresAttributes,
+              .compatibilities
+            )
+          ' td.json \
           | jq --arg NAME "$CONTAINER_NAME" --arg IMG "$NEW_IMAGE" '
               .containerDefinitions = (
                 .containerDefinitions | map(
                   if .name == $NAME then .image = $IMG | . else . end
                 )
-              )' \
-          > rendered-taskdef.json
+              )
+            ' > rendered-taskdef.json
 
           NEW_TD_ARN=$(aws ecs register-task-definition \
             --cli-input-json file://rendered-taskdef.json \
             --query 'taskDefinition.taskDefinitionArn' \
             --output text)
 
-          echo "td=$NEW_TD_ARN" >> $GITHUB_OUTPUT
+          echo "td=$NEW_TD_ARN" >> "$GITHUB_OUTPUT"
 
-      - name: Update service to new revision
+      - name: Update service to new revision (bootstrap-safe)
         env:
           ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
           ECS_SERVICE: ${{ vars.ECS_SERVICE }}
           NEW_TD_ARN: ${{ steps.render.outputs.td }}
         run: |
           set -euo pipefail
-          aws ecs update-service \
-            --cluster "$ECS_CLUSTER" \
-            --service "$ECS_SERVICE" \
-            --task-definition "$NEW_TD_ARN"
 
-          # Optional: scale up from 0 for a dev run
-          # aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" --desired-count 1
+          CUR=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" \
+            --query 'services[0].desiredCount' --output text)
 
-      - name: Wait for stability
+          if [ "$CUR" = "0" ] || [ "$CUR" = "None" ]; then
+            # First-ever promote from 0 -> 1
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER" \
+              --service "$ECS_SERVICE" \
+              --task-definition "$NEW_TD_ARN" \
+              --desired-count 1 \
+              --force-new-deployment
+          else
+            # Steady-state: update ONLY the task definition; preserve current count / autoscaling
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER" \
+              --service "$ECS_SERVICE" \
+              --task-definition "$NEW_TD_ARN" \
+              --force-new-deployment
+          fi
+
+      - name: Wait for stability (and fail fast on placement errors)
         env:
           ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
           ECS_SERVICE: ${{ vars.ECS_SERVICE }}
         run: |
+          set -euo pipefail
+          # quick surfacing of common placement failures
+          msg=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" \
+            --query "services[0].events[?contains(message, 'unable to place a task')]|[0].message" --output text || true)
+          if [ "$msg" != "None" ] && [ -n "$msg" ]; then
+            echo "$msg"
+            exit 1
+          fi
+
           aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"

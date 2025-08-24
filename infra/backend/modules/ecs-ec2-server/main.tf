@@ -188,8 +188,12 @@ resource "aws_ecs_service" "nodejs_service" {
   name            = "${var.cluster_name}-service"
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.nodejs_task.arn
-  desired_count   = var.service_desired_count
+  desired_count   = 0
   launch_type     = "EC2"
+
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 100
+  health_check_grace_period_seconds  = 60
 
   # Load balancer configuration (conditional)
   dynamic "load_balancer" {
@@ -203,7 +207,7 @@ resource "aws_ecs_service" "nodejs_service" {
 
   # Enable ECS Service Auto Scaling
   lifecycle {
-    ignore_changes = [desired_count]
+    ignore_changes = [task_definition, desired_count]
   }
 }
 

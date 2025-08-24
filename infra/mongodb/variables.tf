@@ -2,7 +2,7 @@
 variable "vpc_id" {
   description = "VPC ID where resources will be deployed"
   type        = string
-  default     = "vpc-0bbc6afe7a8d32c90"
+  default     = "vpc-0e40433212b981cc5"
 }
 
 variable "mongo_ami_id" {
@@ -15,7 +15,7 @@ variable "mongo_ami_id" {
 variable "ecs_service_sg_id" {
   description = "Security group ID for the ECS service"
   type        = list(string)
-  default     = ["sg-0549ee4eae725fec6"]
+  default     = ["sg-0a83fc3e06288ece4"] 
 }
 # until here
 
