@@ -142,6 +142,43 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
   }
 }
 
+# For the secret pull
+resource "aws_iam_role" "ecs_task_execution" {
+  name = "${var.cluster_name}-ecs-task-execution"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Principal= { Service = "ecs-tasks.amazonaws.com" },
+      Action   = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_exec_managed" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_policy" "ecs_task_exec_secrets" {
+  name   = "${var.cluster_name}-ecs-task-exec-secrets"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Sid      : "GetMongoSecret",
+      Effect   : "Allow",
+      Action   : ["secretsmanager:GetSecretValue"],
+      Resource : var.mongodb_secret_arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_exec_secrets_attach" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = aws_iam_policy.ecs_task_exec_secrets.arn
+}
+
+
 # Create an ECS Task Definition for the Node.js container
 resource "aws_ecs_task_definition" "nodejs_task" {
   family                   = "${var.cluster_name}-task"
@@ -150,6 +187,8 @@ resource "aws_ecs_task_definition" "nodejs_task" {
   cpu                      = var.task_cpu
   memory                   = var.task_memory
 
+  execution_role_arn = aws_iam_role.ecs_task_execution.arn
+  
   container_definitions = jsonencode([
     {
       name      = "nodejs-container"
@@ -164,10 +203,25 @@ resource "aws_ecs_task_definition" "nodejs_task" {
           protocol      = "tcp"
         }
       ]
+
+      secrets = [
+        {
+          name      = "MONGO_PASSWORD"
+          valueFrom = "${var.mongodb_secret_arn}:password::"
+        }
+      ]
       environment = [
         {
-          name  = "MONGODB_URI"
-          value = var.mongodb_uri
+          name  = "MONGO_HOST"
+          value = var.mongo_host
+        },
+        {
+          name  = "MONGO_DB"
+          value = var.mongo_db
+        },
+        {
+          name  = "MONGO_USER"
+          value = var.mongo_user
         }
       ]
 
@@ -191,9 +245,9 @@ resource "aws_ecs_service" "nodejs_service" {
   desired_count   = 0
   launch_type     = "EC2"
 
-  deployment_minimum_healthy_percent = 0
-  deployment_maximum_percent         = 100
-  health_check_grace_period_seconds  = 60
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+  health_check_grace_period_seconds  = 30
 
   # Load balancer configuration (conditional)
   dynamic "load_balancer" {

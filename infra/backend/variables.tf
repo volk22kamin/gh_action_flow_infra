@@ -4,10 +4,28 @@ variable "vpc_id" {
   default     = "vpc-0e40433212b981cc5"
 }
 
-variable "mongodb_uri" {
-  description = "MongoDB connection URI"
+variable "mongo_host" {
+  description = "MongoDB host address"
   type        = string
-  default     = "mongodb://admin:volk_password@10.0.2.79:27017/todo?authSource=admin"
+  default     = "10.0.2.79"
+}
+
+variable "mongo_db" {
+  description = "MongoDB database name"
+  type        = string
+  default     = "todo"
+}
+
+variable "mongo_user" {
+  description = "MongoDB username"
+  type        = string
+  default     = "admin"
+}
+
+variable "mongodb_secret_arn" {
+  description = "mongodb_secret_arn"
+  type        = string
+  default     = "arn:aws:secretsmanager:eu-central-1:667308168455:secret:digi/mongodb-r57xRo"
 }
 
 variable "container_image" {

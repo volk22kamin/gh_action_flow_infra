@@ -22,7 +22,10 @@ module "ecs_ec2_server" {
   ami_id                = var.ami_id
   log_retention_days    = var.log_retention_days
   target_group_arn      = module.ecs_api_alb.target_group_arn
-  mongodb_uri           = var.mongodb_uri
+  mongo_host            = var.mongo_host
+  mongo_db              = var.mongo_db
+  mongo_user            = var.mongo_user
+  mongodb_secret_arn    = var.mongodb_secret_arn
 }
 
 module "ecs_api_alb" {

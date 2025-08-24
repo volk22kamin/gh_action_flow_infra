@@ -117,7 +117,22 @@ variable "ami_id" {
   type        = string
 }
 
-variable "mongodb_uri" {
-  description = "MongoDB connection URI"
+variable "mongo_host" {
+  description = "MongoDB host address"
   type        = string
+}
+
+variable "mongo_db" {
+  description = "MongoDB database name"
+  type        = string
+}
+
+variable "mongo_user" {
+  description = "MongoDB username"
+  type        = string
+}
+
+variable "mongodb_secret_arn" {
+  description = "mongodb_secret_arn"
+  type = string
 }
