@@ -8,6 +8,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY ./*.json ./
+COPY ./db.js ./db.js
 COPY ./index.js ./index.js
 COPY ./models ./models
 COPY ./routes ./routes
