@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
         const savedTodo = await todo.save();
         res.json(savedTodo);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating todo' });
+        res.status(500).json({ error: 'Error creating todo!' });
     }
 });
 
