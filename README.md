@@ -4,7 +4,7 @@ This repository contains a full-stack application with a robust infrastructure-a
 
 
 - **VPC**: Custom Virtual Private Cloud for network isolation. Resources like ECS, MongoDB are deployed in private subnets with no direct connection to the internet.
-- **Security Groups**: Strict security groups are enforced:
+- **Security Groups**: A standalone module. After networking is created (to provide the VPC ID), the security group module is deployed. Its output (the SG ID) is then passed to both the backend and MongoDB modules to enforce strict communication rules:
 	- ALB and ECS communicate only through a dedicated SG.
 	- MongoDB and ECS communicate only through a dedicated SG.
 - **MongoDB on EC2**: Database runs on an EC2 instance within the VPC. AWS SSM agent is installed on all EC2 instances for secure, auditable connections (no SSH exposure).
