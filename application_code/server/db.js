@@ -20,4 +20,4 @@ partsUri ??
     ? "mongodb://localhost:27017/todoapp_test"
     : "mongodb://localhost:27017/todoapp");
 
-module.exports = { uri };
+export { uri };
