@@ -1,0 +1,46 @@
+name: Client Deploy (S3 [+ CloudFront])
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'application_code/client/**'
+      - '.github/workflows/client-deploy.yml'
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Upload index.html
+        run: |
+          set -euo pipefail
+          SRC="application_code/client/index.html"
+          if [ ! -f "$SRC" ]; then
+            echo "Missing $SRC"; exit 1
+          fi
+          # Ensure correct Content-Type and avoid stale caching on HTML
+          aws s3 cp "$SRC" "s3://${{ vars.S3_BUCKET }}/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --metadata-directive REPLACE
+
+      - name: Invalidate CloudFront (optional)
+        if: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/index.html"

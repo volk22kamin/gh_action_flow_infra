@@ -14,17 +14,6 @@ resource "aws_acm_certificate" "this" {
   }
 }
 
-resource "aws_route53_record" "root_cf" {
-  zone_id = var.route53_zone_id
-  name    = var.domain_name        
-  type    = "A"
-
-  alias {
-    name                   = var.cloudfront_domain_name
-    zone_id                = "Z2FDTNDATAQYW2"
-    evaluate_target_health = false
-  }
-}
 
 resource "aws_route53_record" "validation" {
   for_each = {
@@ -40,12 +29,25 @@ resource "aws_route53_record" "validation" {
   type    = each.value.type
   records = [each.value.record]
   ttl     = 60
+  allow_overwrite = true
 }
 
 resource "aws_acm_certificate_validation" "this" {
   provider                  = aws.virginia
   certificate_arn           = aws_acm_certificate.this.arn
   validation_record_fqdns   = [for record in aws_route53_record.validation : record.fqdn]
+}
+
+resource "aws_route53_record" "root_cf" {
+  zone_id = var.route53_zone_id
+  name    = var.domain_name        
+  type    = "A"
+
+  alias {
+    name                   = var.cloudfront_domain_name
+    zone_id                = "Z2FDTNDATAQYW2"
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_route53_record" "app_cf" {

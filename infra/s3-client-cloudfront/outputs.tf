@@ -23,22 +23,22 @@ output "client_s3_index_object_etag" {
   value       = module.client_s3.index_object_etag
 }
 
-# output "cloudfront_distribution_id" {
-#   description = "The ID of the CloudFront distribution"
-#   value       = module.cloudfront.distribution_id
-# }
+output "cloudfront_distribution_id" {
+  description = "The ID of the CloudFront distribution"
+  value       = module.cloudfront.distribution_id
+}
 
-# output "cloudfront_distribution_arn" {
-#   description = "The ARN of the CloudFront distribution"
-#   value       = module.cloudfront.distribution_arn
-# }
+output "cloudfront_distribution_arn" {
+  description = "The ARN of the CloudFront distribution"
+  value       = module.cloudfront.distribution_arn
+}
 
-# output "cloudfront_domain_name" {
-#   description = "The domain name of the CloudFront distribution"
-#   value       = module.cloudfront.domain_name
-# }
+output "cloudfront_domain_name" {
+  description = "The domain name of the CloudFront distribution"
+  value       = module.cloudfront.domain_name
+}
 
-# output "cloudfront_oac_id" {
-#   description = "The ID of the CloudFront Origin Access Control"
-#   value       = module.cloudfront.oac_id
-# }
+output "cloudfront_oac_id" {
+  description = "The ID of the CloudFront Origin Access Control"
+  value       = module.cloudfront.oac_id
+}
