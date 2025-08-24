@@ -31,7 +31,7 @@ variable "mongodb_secret_arn" {
 variable "container_image" {
   description = "Docker image for the Node.js container"
   type        = string
-  default     = "667308168455.dkr.ecr.eu-central-1.amazonaws.com/secure-app-backend:75ef53f12813"
+  default     = "667308168455.dkr.ecr.eu-central-1.amazonaws.com/secure-app-backend:b5bb71955284"
 }
 
 variable "ami_id" {

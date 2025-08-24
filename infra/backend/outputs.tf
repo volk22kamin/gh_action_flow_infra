@@ -1,3 +1,22 @@
+output "ecs_task_execution_role_arn" {
+  description = "ARN of the ECS task execution IAM role"
+  value       = module.ecs_ec2_server.ecs_task_execution_role_arn
+}
+
+output "ecs_task_exec_secrets_policy_arn" {
+  description = "ARN of the ECS task execution secrets policy"
+  value       = module.ecs_ec2_server.ecs_task_exec_secrets_policy_arn
+}
+
+output "ecs_task_exec_secrets_attach_id" {
+  description = "ID of the ECS task exec secrets policy attachment"
+  value       = module.ecs_ec2_server.ecs_task_exec_secrets_attach_id
+}
+
+output "ecs_task_exec_managed_attach_id" {
+  description = "ID of the ECS task exec managed policy attachment"
+  value       = module.ecs_ec2_server.ecs_task_exec_managed_attach_id
+}
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   value       = module.ecs_ec2_server.ecs_cluster_name

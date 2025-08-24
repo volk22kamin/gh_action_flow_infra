@@ -65,13 +65,13 @@ variable "client_bucket_name" {
 variable "ecs_task_execution_role_name" {
   description = "Name of the ECS task execution role your tasks use"
   type        = string
-  default     = "ecsTaskExecutionRole"
+  default     = "dev-cluster-ecs-task-role"
 }
 
 variable "ecs_task_role_name" {
   description = "Name of the task role for your application task (if used)"
   type        = string
-  default     = "secure-app-task-role"
+  default     = "dev-cluster-ecs-task-role"
 }
 
 variable "iam_role_name" {
@@ -207,6 +207,12 @@ data "aws_iam_policy_document" "github_permissions" {
       local.task_execution_role_arn,
       local.task_role_arn
     ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
+
   }
 
   statement {
