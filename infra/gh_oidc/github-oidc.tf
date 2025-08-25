@@ -1,19 +1,3 @@
-# github-oidc.tf
-#
-# Terraform to set up GitHub Actions OIDC access to AWS (no long-lived keys).
-# - Creates IAM OIDC provider for GitHub (token.actions.githubusercontent.com)
-# - Creates an IAM role trusted by GitHub OIDC, locked to your repo + branch OR environment
-# - Attaches a minimal policy for ECR push/pull, ECS deploy, S3 upload (client), and CloudFront invalidation
-#
-# Usage:
-#   1) Set variables (see "Variables" below or provide via *.tfvars)
-#   2) terraform init && terraform apply
-#   3) Use the output "github_oidc_role_arn" in your GitHub Actions workflow with aws-actions/configure-aws-credentials
-
-############################################################
-# Data sources
-############################################################
-
 data "aws_caller_identity" "current" {}
 
 ############################################################

@@ -1,5 +1,5 @@
-vpc_id = "vpc-02099f6c829cbc203"
-ecs_sg_id = "sg-0d6c8a21e5ba30f99"
+vpc_id = "vpc-0988490a1ac08d378"
+ecs_sg_id = "sg-0f19e04e0b6ee2d8e"
 alb_name = "secure-app-server"
 container_port = 3000
 health_check_path = "/health"
@@ -8,7 +8,7 @@ service_cpu_target = 1
 service_desired_count = 0
 service_min_count = 0
 service_max_count = 3
-mongo_host = "10.0.2.119"
+mongo_host = "10.0.2.125"
 mongo_db = "todo"
 mongo_user = "admin"
 mongodb_secret_arn = "arn:aws:secretsmanager:eu-central-1:667308168455:secret:digi/mongodb-r57xRo"

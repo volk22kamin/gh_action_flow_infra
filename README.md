@@ -1,13 +1,14 @@
 # Project Overview
+---
 
-This repository contains a full-stack application with a robust infrastructure-as-code setup using Terraform. Below is a summary of the architecture and CI/CD flow:
-
+**Note:**
+Currently, the credentials for the initial creation of the MongoDB database are hardcoded. The best practice would be to build an AMI that also includes the AWS CLI (since there is no NAT/internet access), use the VPC endpoint to connect to AWS Secrets Manager, and assign a policy and role to the MongoDB instance to allow it to retrieve the secret securely. Due to time constraints, this is not yet implemented, but is the recommended approach for production.
 
 - **VPC**: Custom Virtual Private Cloud for network isolation. Resources like ECS, MongoDB are deployed in private subnets with no direct connection to the internet.
 - **Security Groups**: A standalone module. After networking is created (to provide the VPC ID), the security group module is deployed. Its output (the SG ID) is then passed to both the backend and MongoDB modules to enforce strict communication rules:
 	- ALB and ECS communicate only through a dedicated SG.
 	- MongoDB and ECS communicate only through a dedicated SG.
-- **MongoDB on EC2**: Database runs on an EC2 instance within the VPC. AWS SSM agent is installed on all EC2 instances for secure, auditable connections (no SSH exposure).
+- **MongoDB on EC2**: Database runs on an EC2 instance within the VPC. The AMI is custom-built by me to include MongoDB and the AWS SSM agent, since the instance runs in a private subnet without NAT (no internet access). This allows for secure, auditable connections (no SSH exposure).
 - **Secrets Management**: MongoDB password is generated and stored in AWS Secrets Manager, and securely passed as a secret to the ECS task at runtime. Secret created manually as to not have the password in terraform's state.
 - **ECS Cluster**: Hosts the application server as a container. The ECS service is set to 0 tasks by default; the CI pipeline can scale it up as needed. An Auto Scaling Group (ASG) is configured to scale ECS tasks based on CPU load.
 - **ALB (Application Load Balancer)**: Exposes the ECS service to the internet.
@@ -21,9 +22,9 @@ This repository contains a full-stack application with a robust infrastructure-a
 
 ## Deployment Order
 1. **Networking**: Run `terraform init` and `terraform apply` in the `infra/networking` directory to create the VPC and networking resources.
-2. **Pass VPC ID**: Take the VPC ID output and pass it as a variable to both the `mongodb` and `backend` modules.
-3. **Deploy MongoDB and Backend**: Deploy `infra/mongodb` and `infra/backend` with the VPC ID. After deploying, take the `ecs_service_sg_id` (ECS security group ID) output from the backend.
-4. **Update MongoDB SG**: Pass the `ecs_service_sg_id` to the MongoDB module and re-apply. This ensures only ECS tasks can communicate with MongoDB.
+2. **Pass VPC ID to SG Module**: Take the VPC ID output and pass it to the standalone SG module. Apply to create the security group.
+3. **Pass SG ID to MongoDB**: Take the SG ID output from the SG module and pass it to the MongoDB module. Apply to deploy MongoDB with the correct security group.
+4. **Pass SG ID and Mongo Host to Backend**: After MongoDB is deployed, pass both the SG ID and the MongoDB host output from the MongoDB module to the backend module. Apply to deploy the backend with the correct security group and database connection.
 5. **S3 and CloudFront**: Deploy the S3 bucket and CloudFront distribution first, without passing ACM or ALB DNS names. This allows the static client to be available and CloudFront to be set up with basic configuration.
 6. **ACM and ALB**: Deploy ACM (certificate) and ALB. After ACM is validated and ALB is available, update CloudFront and S3 with the ACM and ALB DNS names as needed.
 7. **Route53**: Deploy `infra/route53` to create DNS records. Take the NS records and add them to your DNS provider (e.g., Namecheap).
